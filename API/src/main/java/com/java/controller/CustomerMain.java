@@ -2,31 +2,37 @@ package com.java.controller;
 
 import com.google.gson.Gson;
 import com.java.model.CustomerDetail;
+import com.java.model.ResponseModel;
 import com.java.service.ProcessCustomerDetail;
+
+import java.sql.SQLException;
 
 public class CustomerMain {
 
-    public String processRequest(String request) {
+    public String processRequest(String request) throws SQLException {
+
         Gson gson = new Gson();
+        String response = "";
 
         CustomerDetail customerDetail = gson.fromJson(request, CustomerDetail.class);
         String screen = customerDetail.getScreen();
         switch (screen) {
             case "CustomerDetail":
                 ProcessCustomerDetail processCutomerDetail = new ProcessCustomerDetail();
-                CustomerDetail response = processCutomerDetail.customerDetail(customerDetail);
+               ResponseModel responseModel= processCutomerDetail.customerDetail(customerDetail);
+              response =gson.toJson(responseModel);
                 break;
 
             default:
 
                 break;
         }
-        return "";
+        return response;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         String requet="{\n" +
-                "  \"primaryPhone\": \"+91345678723\",\n" +
+                "  \"primaryPhone\": \"+91345667852\",\n" +
                 "  \"alternatePhone\": \"23456745678\",\n" +
                 "  \"latitude\": 20.345678,\n" +
                 "  \"longitude\": -12.34567,\n" +
@@ -48,6 +54,6 @@ public class CustomerMain {
                 "}";
         CustomerMain customerMain=new CustomerMain();
         String s = customerMain.processRequest(requet);
-        System.out.println("Done process....");
+        System.out.println(s);
     }
 }
