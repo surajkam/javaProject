@@ -1,6 +1,8 @@
 package com.java.service;
 
 import com.java.model.CustomerDetail;
+import com.java.model.Detail;
+import com.java.model.ResponseM;
 import com.java.model.ResponseModel;
 
 import java.sql.*;
@@ -12,10 +14,17 @@ public class ProcessCustomerDetail {
         return responseModel;
     }
 
+    public ResponseM detail(Detail detail) {
+        ResponseM responseM = InsertD(detail);
+        return responseM;
+
+    }
+
+
     public ResponseModel insertData(CustomerDetail customerDetail) throws SQLException {
         Connection con = null;
         PreparedStatement preparedStatement = null;
-        ResponseModel responseModel=new ResponseModel();
+        ResponseModel responseModel = new ResponseModel();
         try {
 
             Class.forName("com.mysql.jdbc.Driver");
@@ -60,4 +69,49 @@ public class ProcessCustomerDetail {
         }
         return responseModel;
     }
+
+
+    public ResponseM InsertD(Detail detail) {
+        Connection con = null;
+        PreparedStatement preparedStatement = null;
+        ResponseM responseM = new ResponseM();
+
+        try {
+
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/customer", "root", "Mayur@27");
+            String sql = "INSERT INTO customer.customer (primary_phone,accuracy,customer_name,nationalid_image,customerid_number,assessmentid)" +
+                    " VALUES (?, ?, ?, ?, ?, ?)";
+            preparedStatement = con.prepareStatement(sql);
+            preparedStatement.setString(1, detail.getPrimaryPhone());
+            preparedStatement.setString(2, String.valueOf(detail.getAccuracy()));
+            preparedStatement.setString(3, detail.getCustomerName());
+            preparedStatement.setString(4, detail.getNationalIdImage());
+            preparedStatement.setString(5, detail.getCustomerIdNumber());
+            preparedStatement.setString(6, String.valueOf(detail.getAssessmentId()));
+            int rowAffected = preparedStatement.executeUpdate();
+
+            if (rowAffected > 0) {
+                responseM.setStatuses("Success");
+                responseM.setMessages("Details inserted Successfully....");
+                responseM.setCustomerNames(detail.getCustomerName());
+                responseM.setAssessmentIds(String.valueOf(detail.getAssessmentId()));
+
+            } else {
+                responseM.setStatuses("Failed");
+                responseM.setMessages("issue getting while inserting details...");
+
+            }
+            con.close();
+            preparedStatement.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseM.setStatuses("Failed");
+            responseM.setMessages("issue getting while inserting details...");
+        }
+        return responseM;
+
+    }
 }
+
